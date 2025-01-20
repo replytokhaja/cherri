@@ -1,0 +1,80 @@
+LinkedInMessageSender = {
+  config: {
+    scrollDelay: 3000,
+    actionDelay: 5000,
+    maxMessages: 10, // Set to -1 for no limit
+    totalMessagesSent: 0,
+  },
+  init: function (config) {
+    console.info("INFO: Script initialized...");
+    setTimeout(() => this.collectProfiles(config), config.scrollDelay);
+  },
+  collectProfiles: function (config) {
+    const profileLinks = document.querySelectorAll("a.app-aware-link");
+    console.debug("DEBUG: Found " + profileLinks.length + " profiles on the page.");
+    if (profileLinks.length > 0) {
+      this.profiles = [...profileLinks];
+      this.profileIndex = 0;
+      console.info("INFO: Starting messaging...");
+      setTimeout(() => this.messageProfile(config), config.actionDelay);
+    } else {
+      console.warn("WARN: No profiles found on the page!");
+      this.complete(config);
+    }
+  },
+  messageProfile: function (config) {
+    if (config.maxMessages === 0 || this.profileIndex >= this.profiles.length) {
+      console.info("INFO: Max messages reached or all profiles processed.");
+      this.complete(config);
+      return;
+    }
+
+    const profile = this.profiles[this.profileIndex];
+    profile.click();
+    console.debug("DEBUG: Opened profile " + (this.profileIndex + 1));
+    setTimeout(() => {
+      const messageButton = document.querySelector("button[aria-label='Message']");
+      if (messageButton) {
+        console.info("INFO: Message button found. Sending message...");
+        messageButton.click();
+        setTimeout(() => this.sendMessage(config), config.actionDelay);
+      } else {
+        console.warn("WARN: No Message button found. Skipping profile.");
+        this.profileIndex++;
+        setTimeout(() => this.messageProfile(config), config.actionDelay);
+      }
+    }, config.actionDelay);
+  },
+  sendMessage: function (config) {
+    const messageBox = document.querySelector("div.msg-form__contenteditable");
+    if (messageBox) {
+      messageBox.innerText = "Hi, I hope this message finds you well. My name is Aamer, and I have 11 years of experience as DevOps/Cloud Engineer.I am currently seeking opportunities and was wondering if there are any vacancies or within your network that align with my profile.
+
+Please let me know if you have any insights or advice regarding opportunities. I’d greatly appreciate your guidance!
+
+Thank you for your time and consideration.
+
+Best regards,
+Abdul Khaja"; // Customize your message here
+      console.debug("DEBUG: Entered message.");
+      const sendButton = document.querySelector("button[aria-label='Send']");
+      if (sendButton) {
+        sendButton.click();
+        console.info("INFO: Message sent to profile " + (this.profileIndex + 1));
+        config.maxMessages--;
+        config.totalMessagesSent++;
+      } else {
+        console.warn("WARN: No Send button found. Skipping profile.");
+      }
+    } else {
+      console.warn("WARN: No message box found. Skipping profile.");
+    }
+    this.profileIndex++;
+    setTimeout(() => this.messageProfile(config), config.actionDelay);
+  },
+  complete: function (config) {
+    console.info("INFO: Script completed after sending " + config.totalMessagesSent + " messages.");
+  },
+};
+
+LinkedInMessageSender.init(LinkedInMessageSender.config);
