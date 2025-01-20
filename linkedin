@@ -8,7 +8,7 @@ Linkedin = {
     totalRequestsSent: 0,
     // set to false to skip adding note in invites
     addNote: true,
-    note: "Hey, I'm looking forward to connecting with you!",
+    note: "Hey, I'm looking forward to connecting with you!My name is Abdul, and I have 11 years of experience as DevOps/Cloud Engineer.I am currently seeking opportunities on C2C or C2H and was wondering if there are any vacancies or within your network that align with my profile.Thank you",
   },
   init: function (data, config) {
     console.info("INFO: script initialized on the page...");
