@@ -1,0 +1,91 @@
+LinkedInJobApply = {
+  config: {
+    scrollDelay: 3000,
+    actionDelay: 5000,
+    nextPageDelay: 5000,
+    maxApplications: -1, // Set to -1 for no limit
+    totalApplicationsSent: 0,
+  },
+  init: function (data, config) {
+    console.info("INFO: Script initialized...");
+    console.debug("DEBUG: Scrolling to bottom in " + config.scrollDelay + " ms");
+    setTimeout(() => this.scrollBottom(data, config), config.actionDelay);
+  },
+  scrollBottom: function (data, config) {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    console.debug("DEBUG: Scrolling to top in " + config.scrollDelay + " ms");
+    setTimeout(() => this.scrollTop(data, config), config.scrollDelay);
+  },
+  scrollTop: function (data, config) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    console.debug("DEBUG: Inspecting job listings in " + config.scrollDelay + " ms");
+    setTimeout(() => this.inspect(data, config), config.scrollDelay);
+  },
+  inspect: function (data, config) {
+    const jobCards = document.querySelectorAll(".job-card-container__link");
+    console.debug("DEBUG: Found " + jobCards.length + " job cards on the page.");
+    if (jobCards.length > 0) {
+      data.jobCards = [...jobCards];
+      data.jobIndex = 0;
+      console.debug("DEBUG: Starting job applications...");
+      setTimeout(() => this.applyJob(data, config), config.actionDelay);
+    } else {
+      console.warn("WARN: No job cards found on the page!");
+      this.nextPage(config);
+    }
+  },
+  applyJob: function (data, config) {
+    if (config.maxApplications === 0) {
+      console.info("INFO: Max applications reached.");
+      this.complete(config);
+    } else if (data.jobIndex >= data.jobCards.length) {
+      console.info("INFO: Completed all job applications on the page.");
+      this.nextPage(config);
+    } else {
+      const jobCard = data.jobCards[data.jobIndex];
+      jobCard.click();
+      console.debug("DEBUG: Opened job card " + (data.jobIndex + 1));
+      setTimeout(() => {
+        const easyApplyButton = document.querySelector("button[data-control-name='jobdetails_topcard_inapply']");
+        if (easyApplyButton) {
+          console.info("INFO: Easy Apply button found. Applying...");
+          easyApplyButton.click();
+          setTimeout(() => this.completeApplication(data, config), config.actionDelay);
+        } else {
+          console.warn("WARN: No Easy Apply button found for this job.");
+          data.jobIndex++;
+          setTimeout(() => this.applyJob(data, config), config.actionDelay);
+        }
+      }, config.actionDelay);
+    }
+  },
+  completeApplication: function (data, config) {
+    const submitButton = document.querySelector("button[aria-label='Submit application']");
+    if (submitButton) {
+      submitButton.click();
+      console.info("INFO: Application submitted for job " + (data.jobIndex + 1));
+      config.maxApplications--;
+      config.totalApplicationsSent++;
+    } else {
+      console.warn("WARN: No submit button found. Skipping job.");
+    }
+    data.jobIndex++;
+    setTimeout(() => this.applyJob(data, config), config.actionDelay);
+  },
+  nextPage: function (config) {
+    const nextPageButton = document.querySelector(".artdeco-pagination__button--next");
+    if (nextPageButton && !nextPageButton.disabled) {
+      console.info("INFO: Moving to the next page...");
+      nextPageButton.click();
+      setTimeout(() => this.init({}, config), config.nextPageDelay);
+    } else {
+      console.info("INFO: No next page available. Ending script.");
+      this.complete(config);
+    }
+  },
+  complete: function (config) {
+    console.info("INFO: Script completed after sending " + config.totalApplicationsSent + " applications.");
+  },
+};
+
+LinkedInJobApply.init({}, LinkedInJobApply.config);
