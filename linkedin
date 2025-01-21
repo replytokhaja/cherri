@@ -8,7 +8,7 @@ Linkedin = {
     totalRequestsSent: 0,
     // set to false to skip adding note in invites
     addNote: true,
-    note: "Hi,I’m Abdul,a DevOps/Cloud Engineer with 11 years of experience. I’m currently exploring C2C or C2H opportunities and would love to connect. If you know of any openings that align with my profile, feel free to reach out at mohammadkhaja7822@gmail.com.Looking forward to connecting!Thank you.",
+    note: "Hi,I’m Abdul,a DevOps/Cloud Engineer with 11 years of experience. I’m currently exploring C2C or C2H opportunities and would love to connect. If you know of any openings that align with my profile, feel free to reach out at mohammadkhaja7822@gmail.com.Looking forward to connecting! Thank you.",
   },
   init: function (data, config) {
     console.info("INFO: script initialized on the page...");
